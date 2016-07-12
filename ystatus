@@ -11,7 +11,7 @@ my $mpd = Audio::MPD->new;
 
 # compile status line
 
-my $output = battery() . $separator . datetime() . $separator . music();
+my $output = test() . battery() . $separator . datetime() . $separator . music();
 
 # dump
 
@@ -60,4 +60,8 @@ sub music {
     }
 
     return "♪ none" 
+}
+
+sub test {
+    return "#[fg=red,bold]red#[default]";
 }

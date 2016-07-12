@@ -27,7 +27,7 @@ sub battery {
 
     my $power = "⏚";
 
-    if(<$status eq "Charging\n") {
+    if($status eq "Charging\n") {
         $power = "⚡";
     }
 

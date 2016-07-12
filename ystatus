@@ -1,0 +1,60 @@
+#!/usr/bin/perl
+use strict;
+use warnings;
+use POSIX qw/strftime/;
+use Audio::MPD;
+
+# initialize the connection to MPD
+my $mpd = Audio::MPD->new;
+
+# compile status line
+
+my $output = battery() . " | " . datetime() . " | " . music();
+
+# dump
+
+$output =~ s/\n//g;
+print $output, "\n";
+
+# routines to extract information as necessary
+
+sub battery {
+    # read from /sys/class/power_supply/BAT0/ for information
+
+    open my $status, '<', "/sys/class/power_supply/BAT0/status";
+    open my $now, '<', "/sys/class/power_supply/BAT0/energy_now";
+    open my $full, '<', "/sys/class/power_supply/BAT0/energy_full";
+
+    # when charging, lightning bolt emoji,
+    # else quite literal discharing emoji (electical GND symbol!)
+
+    my $symbol = <$status> eq "Charging\n" ? "⚡" : "⏚";
+
+    my $line = $symbol . " " . int(<$now> * 100 / <$full>) . "%";
+    
+    close $now;
+    close $full;
+    close $status;
+    
+    return $line;   
+}
+
+sub datetime {
+    return "⌚ " . strftime "%H:%M | %a %y-%m-%d", localtime;
+}
+
+sub music {
+    if($mpd) {
+        my $status = $mpd->status;
+
+        if($status->state eq "play") {
+            my $song = $mpd->current;
+
+            if($song) {
+                return "♪ " . $song->title;
+            }
+        }
+    }
+
+    return "♪ none" 
+}

@@ -25,18 +25,19 @@ sub battery {
     open my $now, '<', "/sys/class/power_supply/BAT0/energy_now";
     open my $full, '<', "/sys/class/power_supply/BAT0/energy_full";
 
-    # when charging, lightning bolt emoji,
-    # else quite literal discharing emoji (electical GND symbol!)
+    my $power = "⏚";
 
-    my $symbol = <$status> eq "Charging\n" ? "⚡" : "⏚";
+    if(<$status eq "Charging\n") {
+        $power = "⚡";
+    }
 
-    my $line = $symbol . " " . int(<$now> * 100 / <$full>) . "%";
-    
+    my $line = $power . " " . int(<$now> * 100 / <$full>) . "%";
+
     close $now;
     close $full;
     close $status;
-    
-    return $line;   
+
+    return $line;
 }
 
 sub datetime {

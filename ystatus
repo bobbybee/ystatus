@@ -4,12 +4,14 @@ use warnings;
 use POSIX qw/strftime/;
 use Audio::MPD;
 
+my $separator = " 〉";
+
 # initialize the connection to MPD
 my $mpd = Audio::MPD->new;
 
 # compile status line
 
-my $output = battery() . " | " . datetime() . " | " . music();
+my $output = battery() . $separator . datetime() . $separator . music();
 
 # dump
 
@@ -41,7 +43,7 @@ sub battery {
 }
 
 sub datetime {
-    return "⌚ " . strftime "%H:%M | %a %y-%m-%d", localtime;
+    return "⌚ " . strftime "%H:%M" . $separator . "%a %y-%m-%d", localtime;
 }
 
 sub music {

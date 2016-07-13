@@ -4,6 +4,7 @@ use warnings;
 use POSIX qw/strftime/;
 use Audio::MPD;
 
+
 my $separator = " 〉";
 
 # initialize the connection to MPD
@@ -11,7 +12,7 @@ my $mpd = Audio::MPD->new;
 
 # compile status line
 
-my $output = test() . battery() . $separator . datetime() . $separator . music();
+my $output = battery() . $separator . datetime() . $separator . music();
 
 # dump
 
@@ -27,9 +28,14 @@ sub battery {
     open my $now, '<', "/sys/class/power_supply/BAT0/energy_now";
     open my $full, '<', "/sys/class/power_supply/BAT0/energy_full";
 
+    my $attributes = "#[fg=red]";
     my $power = "⏚";
 
-    if($status eq "Charging\n") {
+    $status = <$status>;
+    $status =~ s/\s+$//;
+
+    if($status eq "Charging") {
+        $attributes = "#[fg=green]";
         $power = "⚡";
     }
 
@@ -39,7 +45,7 @@ sub battery {
     close $full;
     close $status;
 
-    return $line;
+    return $attributes . $line . "#[default]";
 }
 
 sub datetime {
@@ -60,8 +66,4 @@ sub music {
     }
 
     return "♪ none" 
-}
-
-sub test {
-    return "#[fg=red,bold]red#[default]";
 }
